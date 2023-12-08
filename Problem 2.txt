@@ -1,0 +1,11 @@
+import pandas as pd
+
+def students_and_examinations(students: pd.DataFrame, subjects: pd.DataFrame, examinations: pd.DataFrame) -> pd.DataFrame:
+    get_cnt = examinations.groupby(['subject_name', 'student_id'])['subject_name'].count().reset_index(name='attended_exams')
+    students['key'] = 1
+    subjects['key'] = 1
+    final = pd.merge(students, subjects, on='key').drop("key",axis = 1)
+    final = final.merge(get_cnt, left_on = ['subject_name', 'student_id'], right_on = ['subject_name', 'student_id'], how = 'left')
+    final['attended_exams'] = final['attended_exams'].fillna(0)
+    final = final.sort_values(by = ['student_id','subject_name'])
+    return final[['student_id','student_name','subject_name','attended_exams']]
